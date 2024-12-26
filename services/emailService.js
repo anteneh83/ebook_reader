@@ -11,9 +11,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Send a verification email
 exports.sendVerificationEmail = async (email, token) => {
-  const verificationUrl = `http://localhost:3000/verify-email?token=${token}`; 
+  const verificationUrl = `https://ebook-reader.onrender.com/verify-email?token=${token}`;
 
   const mailOptions = {
     from: emailService.fromEmail,
@@ -31,3 +30,4 @@ exports.sendVerificationEmail = async (email, token) => {
     throw new Error('Email sending failed');
   }
 };
+
