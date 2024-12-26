@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendVerificationEmail = async (email, token) => {
-  const verificationUrl = `https://ebook-reader.onrender.com/verify-email?token=${token}`;
+  const verificationUrl = `https://ebook-readers.onrender.com/verify-email?token=${token}`;
 
   const mailOptions = {
     from: emailService.fromEmail,
