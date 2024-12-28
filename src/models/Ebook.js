@@ -43,6 +43,7 @@ const ebookSchema = new mongoose.Schema({
   }
 });
 
+// Method to calculate the average rating
 ebookSchema.methods.calculateAverageRating = function() {
   if (this.ratings.length > 0) {
     const totalRating = this.ratings.reduce((acc, rating) => acc + rating.rating, 0);
@@ -50,14 +51,14 @@ ebookSchema.methods.calculateAverageRating = function() {
   } else {
     this.averageRating = 0;
   }
-  return this.save();
 };
 
+// Method to increment the download count
 ebookSchema.methods.incrementDownloadCount = function() {
   this.downloadCount += 1;
-  return this.save();
 };
 
+// Pre-save hook to calculate average rating before saving the document
 ebookSchema.pre('save', function(next) {
   this.calculateAverageRating();
   next();

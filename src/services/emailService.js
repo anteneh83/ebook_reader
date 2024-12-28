@@ -1,33 +1,33 @@
+require('dotenv').config();  
+
 const nodemailer = require('nodemailer');
-const { emailService } = require('../config/config');
 
 const transporter = nodemailer.createTransport({
-  host: emailService.smtpHost,
-  port: emailService.smtpPort,
-  secure: true,
+  service: 'gmail',
   auth: {
-    user: emailService.smtpUser,
-    pass: emailService.smtpPass,
+    user: process.env.EMAIL_FROM,  
+    pass: process.env.EMAIL_PASS,  
   },
 });
 
-exports.sendVerificationEmail = async (email, token) => {
-  const verificationUrl = `https://ebook-readers.onrender.com/verify-email?token=${token}`;
+const sendEmailNotification = (recipientEmail, subject, message) => {
 
   const mailOptions = {
-    from: emailService.fromEmail,
-    to: email,
-    subject: 'Please verify your email address',
-    text: `Please click on the following link to verify your email address: ${verificationUrl}`,
-    html: `<p>Please click on the following <a href="${verificationUrl}">link</a> to verify your email address.</p>`,
+    from: process.env.EMAIL_FROM,
+    to: recipientEmail,
+    subject: subject,
+    text: message,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Verification email sent to ${email}`);
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Email sending failed');
-  }
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject('Error sending email: ' + error);
+      } else {
+        resolve(info.response);
+      }
+    });
+  });
 };
 
+module.exports = sendEmailNotification;

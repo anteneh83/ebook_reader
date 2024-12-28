@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,7 +10,8 @@ const userSchema = new mongoose.Schema(
     email: { 
       type: String, 
       required: true, 
-      unique: true 
+      unique: true, 
+      match: [/.+@.+\..+/, 'Please use a valid email address'] 
     },
     password: { 
       type: String, 
@@ -21,13 +21,6 @@ const userSchema = new mongoose.Schema(
       type: String, 
       enum: ['user', 'admin'], 
       default: 'user' 
-    },
-    isVerified: { 
-      type: Boolean, 
-      default: false 
-    },
-    verificationToken: { 
-      type: String 
     },
     createdAt: { 
       type: Date, 
@@ -41,6 +34,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Hash the password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next(); // Only hash if password is modified
 
@@ -52,13 +46,6 @@ userSchema.pre('save', async function(next) {
 // Compare password with hashed password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Generate verification token for email verification
-userSchema.methods.generateVerificationToken = function() {
-  const verificationToken = crypto.randomBytes(20).toString('hex');
-  this.verificationToken = verificationToken;
-  return verificationToken;
 };
 
 module.exports = mongoose.model('User', userSchema);
